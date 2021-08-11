@@ -14,10 +14,10 @@ import _pickle as pickle
 
 LABELS_LIST = [
     {"id": -1, "name":"void", "rgb_values": [0, 0, 0]},
-    {"id": 0, "name":"PIP", "rgb_values": [36, 28, 236]},
-    {"id": 1, "name":"MCP", "rgb_values": [69, 209, 14]},
-    {"id": 2, "name":"CMC", "rgb_values": [183, 50, 250]},
-    {"id": 3, "name":"Wrist", "rgb_values": [10, 0, 0]}
+    {"id": 0, "name":"PIP", "rgb_values": [250, 50, 183]},
+    {"id": 1, "name":"MCP", "rgb_values": [236, 28, 36]},
+    {"id": 2, "name":"CMC", "rgb_values": [14, 209, 69]},
+    {"id": 3, "name":"Wrist", "rgb_values": [255,242,0]}
 ]
 
 def label_img_to_rgb(label_img):
@@ -67,7 +67,6 @@ class Data(data.Dataset):
         to_tensor = transforms.ToTensor()
         img_id = self.image_names[index].replace('.png','')
 
-        print("img_id:", img_id)
 
         img = Image.open(os.path.join(self.root_dir_name,
                                       'raw',
@@ -82,6 +81,14 @@ class Data(data.Dataset):
                                       img_id + '.png'))
 
         target = np.array(target, dtype=np.int64)
+        values = [np.array([0,0,0])]
+
+        for i in range(1280):
+            for j in range(720):
+                value = target[i,j,:]
+                if not np.any(value == values):
+                    values.append(value)
+                    print(values)
 
         target_labels = target[..., 0]
         for label in LABELS_LIST:
