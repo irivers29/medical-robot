@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-import torchvision.models as models
+#import torchvision.models as models
 from torch.utils.data import random_split, DataLoader
 
 
@@ -11,7 +11,7 @@ class SegmentationAE(pl.LightningModule):
 
     def __init__(self, num_classes=5, hparams=None):
         super().__init__()
-        self.hparams = hparams
+        #self.hparams = hparams
         
         """ define the blocks for the encoder """
 
@@ -41,31 +41,64 @@ class SegmentationAE(pl.LightningModule):
         """ use blocks for creating the U-Net architecture """
 
         first_block = self.down_conv1(x)
-        x = self.max_pool(first_block)
-
+        x = self.maxpool(first_block)
+        print("First block \n")
+        print(x.size())
+        print("----------")
         second_block = self.down_conv2(x)
-        x = self.max_pool(second_block)
-
+        x = self.maxpool(second_block)
+        print("Second block \n")
+        print(x.size())
+        print("----------")
         third_block = self.down_conv3(x)
-        x = self.max_pool(third_block)
-
+        x = self.maxpool(third_block)
+        print("Third block \n")
+        print(x.size())
+        print("----------")
         fourth_block = self.down_conv4(x)
-
+        print("Fourth block \n")
+        print(x.size())
+        print("----------")
         x = self.upsampling(fourth_block)
+        print("Upsampling \n")
+        print(x.size())
+        print("----------")
         x = torch.cat([x, third_block], dim = 1)
+        print("concatenate  \n")
+        print(x.size())
+        print("----------")
 
         x = self.up_conv1(x)
+        print("Up conv 1 \n")
+        print(x.size())
+        
         x = self.upsampling(x)
+        print("upsample \n")
+        print(x.size())
+        
         x = torch.cat([x, second_block], dim = 1)
-
+        print("concat \n")
+        print(x.size())
         x = self.up_conv2(x)
+        print("up conv2  \n")
+        print(x.size())
+        print("----------")
         x = self.upsampling(x)
+        print("upsample \n")
+        print(x.size())
+        print("----------")
         x = torch.cat([x, first_block], dim = 1)
-
-        x = self.up_conv1(x)
-
+        print("concat \n")
+        print(x.size())
+        print("----------")
+        x = self.up_conv3(x)
+        print("up conv1 \n")
+        print(x.size())
+        print("----------")
         x = self.one_by_one(x)
-
+        print("one by one \n")
+        print(x.size())
+        print("----------")
         return x
 
 

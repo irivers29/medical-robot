@@ -72,23 +72,27 @@ class Data(data.Dataset):
                                       'raw',
                                       'right',
                                       img_id + '.png')).convert('RGB')
+        crop_zone = (121,300,505,732)
+        cropped_img = img.crop(crop_zone)
+        width,height = cropped_img.size
+        new_width = (int)(width/2)
+        new_height = (int)(height/2)
+        resized_img = cropped_img.resize((new_width,new_height))
 
-        img = to_tensor(img)
+        img = to_tensor(cropped_img)
 
         target = Image.open(os.path.join(self.root_dir_name,
                                       'labeled',
                                       'right',
                                       img_id + '.png'))
+        cropped__target_img = target.crop(crop_zone)
+        width,height = cropped_img.size
+        new_width = (int)(width/2)
+        new_height = (int)(height/2)
+        resized_target_img = cropped_img.resize((new_width,new_height))
 
-        target = np.array(target, dtype=np.int64)
+        target = np.array(cropped__target_img, dtype=np.int64)
         values = [np.array([0,0,0])]
-
-        for i in range(1280):
-            for j in range(720):
-                value = target[i,j,:]
-                if not np.any(value == values):
-                    values.append(value)
-                    print(values)
 
         target_labels = target[..., 0]
         for label in LABELS_LIST:
