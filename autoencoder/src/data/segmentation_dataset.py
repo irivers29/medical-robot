@@ -68,6 +68,8 @@ class Data(data.Dataset):
                                       'right',
                                       img_id + '.png'))
 
+        target = np.array(target, dtype=np.int64)
+
         target_labels = target[..., 0]
         for label in LABELS_LIST:
             mask = np.all(target == label['rgb_values'], axis = 2)
