@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import pytorch_lightning as pl
 import torchvision.models as models
+from torch.utils.data import random_split, DataLoader
 
 
 class SegmentationAE(pl.LightningModule):
@@ -35,37 +36,37 @@ class SegmentationAE(pl.LightningModule):
         self.maxpool = nn.MaxPool2d( kernel_size = 2)
         self.upsampling = nn.Upsample(scale_factor=2)
 
-        def forward(self, x):
+    def forward(self, x):
 
-            """ use blocks for creating the U-Net architecture """
+        """ use blocks for creating the U-Net architecture """
 
-            first_block = self.down_conv1(x)
-            x = self.max_pool(first_block)
+        first_block = self.down_conv1(x)
+        x = self.max_pool(first_block)
 
-            second_block = self.down_conv2(x)
-            x = self.max_pool(second_block)
+        second_block = self.down_conv2(x)
+        x = self.max_pool(second_block)
 
-            third_block = self.down_conv3(x)
-            x = self.max_pool(third_block)
+        third_block = self.down_conv3(x)
+        x = self.max_pool(third_block)
 
-            fourth_block = self.down_conv4(x)
+        fourth_block = self.down_conv4(x)
 
-            x = self.upsampling(fourth_block)
-            x = torch.cat([x, third_block], dim = 1)
+        x = self.upsampling(fourth_block)
+        x = torch.cat([x, third_block], dim = 1)
 
-            x = self.up_conv1(x)
-            x = self.upsampling(x)
-            x = torch.cat([x, second_block], dim = 1)
+        x = self.up_conv1(x)
+        x = self.upsampling(x)
+        x = torch.cat([x, second_block], dim = 1)
 
-            x = self.up_conv2(x)
-            x = self.upsampling(x)
-            x = torch.cat([x, first_block], dim = 1)
+        x = self.up_conv2(x)
+        x = self.upsampling(x)
+        x = torch.cat([x, first_block], dim = 1)
 
-            x = self.up_conv1(x)
+        x = self.up_conv1(x)
 
-            x = self.one_by_one(x)
+        x = self.one_by_one(x)
 
-            return x
+        return x
 
 
     @staticmethod
@@ -91,10 +92,19 @@ class SegmentationAE(pl.LightningModule):
 
         return {'loss': loss}
         
+    def train_dataloader(self, train_data):
+        return DataLoader(train_data)
+
+    def val_dataloader(self, val_data):
+        return DataLoader(val_data)
+
+    def test_dataloader(self, test_data):
+        return DataLoader(test_data)
 
     def validation_step(self, val_batch, batch_idx):
 
         images, targets = val_batch
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=-1, reduction='mean')
 
         """ do forward step """
         forward_output = self.forward(images)
