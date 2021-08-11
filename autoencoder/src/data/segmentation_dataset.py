@@ -53,18 +53,18 @@ class Data(data.Dataset):
         
         to_tensor = transforms.ToTensor()
         img_id = self.image_names[index]
-        
+
         img = Image.open(os.path.join(self.root_dir_name,
                                       'raw',
                                       'right',
-                                      img_id + '.png')).convert('RGB')
+                                      img_id)).convert('RGB')
 
         img = to_tensor(img)
 
         target = Image.open(os.path.join(self.root_dir_name,
                                       'labeled',
-                                      hand,
-                                      img_id + '.png'))
+                                      'right',
+                                      img_id))
 
         target_labels = target[..., 0]
         for label in LABELS_LIST:
