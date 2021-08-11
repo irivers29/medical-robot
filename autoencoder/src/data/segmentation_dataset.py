@@ -52,19 +52,21 @@ class Data(data.Dataset):
     def get_item_from_index(self, index):
         
         to_tensor = transforms.ToTensor()
-        img_id = self.image_names[index]
+        img_id = self.image_names[index].replace('.png','')
+
+        print("img_id:", img_id)
 
         img = Image.open(os.path.join(self.root_dir_name,
                                       'raw',
                                       'right',
-                                      img_id)).convert('RGB')
+                                      img_id + '.png')).convert('RGB')
 
         img = to_tensor(img)
 
         target = Image.open(os.path.join(self.root_dir_name,
                                       'labeled',
                                       'right',
-                                      img_id))
+                                      img_id + '.png'))
 
         target_labels = target[..., 0]
         for label in LABELS_LIST:
