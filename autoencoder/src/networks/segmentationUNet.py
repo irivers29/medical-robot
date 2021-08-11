@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-import torchvsion.models as models
+import torchvision.models as models
 
 
 class SegmentationAE(pl.LightningModule):
