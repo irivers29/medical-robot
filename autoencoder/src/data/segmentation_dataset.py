@@ -14,7 +14,10 @@ import _pickle as pickle
 
 LABELS_LIST = [
     {"id": -1, "name":"void", "rgb_values": [0, 0, 0]},
-
+    {"id": 0, "name":"PIP", "rgb_values": [0, 0, 0]},
+    {"id": 1, "name":"MCP", "rgb_values": [0, 0, 0]},
+    {"id": 2, "name":"CMC", "rgb_values": [0, 0, 0]},
+    {"id": 3, "name":"Wrist", "rgb_values": [0, 0, 0]}
 ]
 
 
@@ -45,3 +48,27 @@ class Data(data.Dataset):
             return self.get_item_from_index(key)
         else:
             raise TypeError("Invalid argument type.")
+
+    def get_item_from_index(self, index, hand):
+        to_tensor = transforms.ToTensor()
+        
+        img = Image.open(os.path.join(self.root_dir_name,
+                                      'raw',
+                                      hand,
+                                      img_id + '.png')).convert('RGB')
+
+        img = to_tensor(img)
+
+        target = Image.open(os.path.join(self.root_dir_name,
+                                      'labeled',
+                                      hand,
+                                      img_id + '.png'))
+
+        target_labels = target[..., 0]
+        for label in LABELS_LIST:
+            mask = np.all(target == label['rgb_values'], axis = 2)
+            target_labels[mask] = label['id']
+
+        target_labels = torch.from_numpy(target_labels.copy())
+
+        return img, target_labels
