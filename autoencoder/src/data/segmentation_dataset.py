@@ -49,12 +49,14 @@ class Data(data.Dataset):
         else:
             raise TypeError("Invalid argument type.")
 
-    def get_item_from_index(self, index, hand):
+    def get_item_from_index(self, index):
+        
         to_tensor = transforms.ToTensor()
+        img_id = self.image_names[index]
         
         img = Image.open(os.path.join(self.root_dir_name,
                                       'raw',
-                                      hand,
+                                      'right',
                                       img_id + '.png')).convert('RGB')
 
         img = to_tensor(img)
