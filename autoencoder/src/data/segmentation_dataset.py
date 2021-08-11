@@ -1,11 +1,13 @@
 """Data utility functions."""
 import os
+from posix import POSIX_FADV_WILLNEED
 
 import numpy as np
 import torch
 import torch.utils.data as data
 from PIL import Image
 from torchvision import transforms
+import os
 
 import _pickle as pickle
 
@@ -21,6 +23,8 @@ class Data(data.Dataset):
     def __init__(self, image_path):
         self.root_dir_name = os.path.dirname(image_path)
 
+        print(os.path)
+        
         with open(image_path) as f:
             self.image_names = f.read().splitlines()
 
