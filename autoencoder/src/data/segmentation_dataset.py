@@ -68,12 +68,15 @@ class Data(data.Dataset):
         to_tensor = transforms.ToTensor()
         img_id = self.image_names[index].replace('.png','')
 
+        #define the path where the images are stored
+        path_imgs = "/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_imgs/"
+        path_labeled = "/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_labeled/"
 
         #img = Image.open(os.path.join(self.root_dir_name,
          #                             'aug_imgs/' +
           #                            img_id + '.png'))
         
-        img = Image.open(os.path.join("/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_imgs/" +
+        img = Image.open(os.path.join(path_imgs +
                                       img_id + '.png'))
         
         crop_zone = (121,300,505,732)
@@ -90,7 +93,7 @@ class Data(data.Dataset):
           #                            img_id + '.png'))
         
         
-        target = Image.open(os.path.join("/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_labels/" +
+        target = Image.open(os.path.join(path_labeled +
                                       img_id + '.png'))
 
         #cropped__target_img = target.crop(crop_zone)
