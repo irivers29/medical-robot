@@ -1,8 +1,9 @@
 """Data utility functions."""
 import os
 from posix import POSIX_FADV_WILLNEED
-
+import cv2
 import numpy as np
+from google.colab.patches import cv2_imshow
 import torch
 import torch.utils.data as data
 from PIL import Image
@@ -13,11 +14,11 @@ import _pickle as pickle
 
 
 LABELS_LIST = [
-    {"id": -1, "name":"void", "rgb_values": [0, 0, 0]},
-    {"id": 0, "name":"PIP", "rgb_values": [250, 50, 183]},
-    {"id": 1, "name":"MCP", "rgb_values": [236, 28, 36]},
-    {"id": 2, "name":"CMC", "rgb_values": [14, 209, 69]},
-    {"id": 3, "name":"Wrist", "rgb_values": [255,242,0]}
+    {"id": 0, "name":"void", "rgb_values": [0, 0, 0]},
+    {"id": 1, "name":"PIP", "rgb_values": [250, 50, 183]},
+    {"id": 2, "name":"MCP", "rgb_values": [236, 28, 36]},
+    {"id": 3, "name":"CMC", "rgb_values": [14, 209, 69]},
+    {"id": 4, "name":"Wrist", "rgb_values": [255,242,0]}
 ]
 
 def label_img_to_rgb(label_img):
@@ -68,27 +69,44 @@ class Data(data.Dataset):
         img_id = self.image_names[index].replace('.png','')
 
 
-        img = Image.open(os.path.join(self.root_dir_name,
-                                      'raw',
-                                      'right',
-                                      img_id + '.png')).convert('RGB')
+        #img = Image.open(os.path.join(self.root_dir_name,
+         #                             'aug_imgs/' +
+          #                            img_id + '.png'))
+        
+        img = Image.open(os.path.join("/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_imgs/" +
+                                      img_id + '.png'))
+        
+        crop_zone = (121,300,505,732)
+        cropped_img = img.crop(crop_zone)
+        width,height = cropped_img.size
+        new_width = (int)(width/2)
+        new_height = (int)(height/2)
+        resized_img = cropped_img.resize((new_width,new_height))
 
-        img = to_tensor(img)
-
-        target = Image.open(os.path.join(self.root_dir_name,
-                                      'labeled',
-                                      'right',
+        img = to_tensor(cropped_img)
+        
+        #target = Image.open(os.path.join(self.root_dir_name,
+         #                             'aug_labels/' +
+          #                            img_id + '.png'))
+        
+        
+        target = Image.open(os.path.join("/content/drive/MyDrive/summer_school_sdu/ROPCA_Vision/aug_labels/" +
                                       img_id + '.png'))
 
-        target = np.array(target, dtype=np.int64)
-        values = [np.array([0,0,0])]
+        #cropped__target_img = target.crop(crop_zone)
+        #width,height = cropped_img.size
+        #new_width = (int)(width/2)
+        #new_height = (int)(height/2)
+        #resized_target_img = cropped_img.resize((new_width,new_height))
 
-        for i in range(1280):
-            for j in range(720):
-                value = target[i,j,:]
-                if not np.any(value == values):
-                    values.append(value)
-                    print(values)
+        cropped_target = target.crop(crop_zone)
+        width,height = cropped_target.size
+        new_width = (int)(width/2)
+        new_height = (int)(height/2)
+        resized_target_img = cropped_img.resize((new_width,new_height))
+
+        target = np.array(cropped_target, dtype=np.int64)
+        values = [np.array([0,0,0])]
 
         target_labels = target[..., 0]
         for label in LABELS_LIST:
